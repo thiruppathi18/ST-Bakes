@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ST BAKES | Cakes & Pastries</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🧁 ST BAKES</div>
+    <p>Fresh Cakes, Bakes & Pastries</p>
+    <div class="login-group">
+      <label>Gmail Address</label>
+      <input id="username" type="email" placeholder="Enter any Gmail address (example@gmail.com)">
+    </div>
+    <div class="login-group">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Enter any password">
+    </div>
+    <button class="login-btn" onclick="login()">🔐 Login</button>
+    <div class="demo-text">Demo mode: Any valid Gmail address and password can log in.</div>
+  </div>
+</div>
+
+<div id="mainPage">
+<header>
+  <div class="logo">🧁 ST BAKES</div>
+  <div class="search">
+    <input id="searchInput" type="text" placeholder="Search cakes, pastries, cookies..." onkeyup="searchProducts()">
+    <button>🔍</button>
+  </div>
+  <button class="cart-btn" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="categories">
+  <div class="category" onclick="filterProducts('All')">All</div>
+  <div class="category" onclick="filterProducts('Cakes')">🍰 Cakes</div>
+  <div class="category" onclick="filterProducts('Pastries')">🧁 Pastries</div>
+  <div class="category" onclick="filterProducts('Cookies')">🍪 Cookies</div>
+  <div class="category" onclick="filterProducts('Breads')">🥖 Breads</div>
+  <div class="category" onclick="filterProducts('Birthday')">🎂 Birthday</div>
+  <div class="category" onclick="filterProducts('Donuts')">🍩 Donuts</div>
+</div>
+
+<section class="banner">
+  <h1>Welcome to ST BAKES 🧁</h1>
+  <p>Enjoy delicious freshly baked cakes, pastries, cookies, breads and sweet treats for every occasion.</p>
+</section>
+
+<div class="container">
+  <h2 class="section-title">Popular Bakes & Pastries</h2>
+  <div class="products" id="products"></div>
+</div>
+
+<div class="modal" id="cartModal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal('cartModal')">×</span>
+    <h2>🛒 Your Cart</h2>
+    <div id="cartItems"></div>
+    <div class="total">Total: ₹<span id="cartTotal">0</span></div>
+    <button class="place-order" onclick="checkout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<div class="modal" id="checkoutModal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal('checkoutModal')">×</span>
+    <h2>📦 Checkout</h2><br>
+
+    <div class="form-group"><label>Full Name</label><input id="customerName" type="text" placeholder="Enter your name"></div>
+    <div class="form-group"><label>Phone Number</label><input id="customerPhone" type="tel" placeholder="Enter 10-digit phone number"></div>
+    <div class="form-group"><label>Delivery Address</label><textarea id="customerAddress" placeholder="Enter complete delivery address"></textarea></div>
+    <div class="form-group"><label>Pincode</label><input id="customerPincode" type="text" placeholder="Enter 6-digit pincode"></div>
+    <div class="form-group"><label>Delivery Date</label><input id="deliveryDate" type="date"></div>
+
+    <h3>💳 Payment Method</h3>
+    <div class="payment-options">
+      <label class="payment-radio-label">
+        <input type="radio" name="payment" value="UPI" onchange="showUPI()" checked>
+        <span class="payment-title">📱 UPI Payment (Scan & Pay with GPay / PhonePe / Paytm)</span>
+      </label>
+      <label class="payment-radio-label">
+        <input type="radio" name="payment" value="COD" onchange="hideUPI()">
+        <span class="payment-title">💵 Cash on Delivery</span>
+      </label>
+    </div>
+
+    <div id="upiBox" class="upi-checkout-card">
+      <div class="upi-card-header">
+        <span class="upi-badge">⚡ INSTANT UPI QR</span>
+        <span class="upi-note">Scan with any UPI App</span>
+      </div>
+      <div class="upi-card-body">
+        <div class="upi-mini-qr" onclick="openScannerModalDirectly()" title="Click to open full scanner">
+          <div id="checkoutMiniQr"></div>
+          <div class="mini-laser"></div>
+          <span class="mini-qr-hint">Tap to expand</span>
+        </div>
+        <div class="upi-card-info">
+          <div class="upi-accepted">
+            <span>Accepted Apps:</span>
+            <div class="upi-mini-badges">
+              <span class="mini-badge gpay">GPay</span>
+              <span class="mini-badge phonepe">PhonePe</span>
+              <span class="mini-badge paytm">Paytm</span>
+              <span class="mini-badge bhim">BHIM</span>
+            </div>
+          </div>
+          <div class="upi-id-row">
+            <span>Bakery UPI: <b>stbakes@okaxis</b></span>
+            <button type="button" class="mini-copy-btn" onclick="copyUpiId(event)">📋 Copy</button>
+          </div>
+          <p class="upi-instruct">📌 Clicking <b>Place Order</b> opens the full QR Scanner to scan & pay.</p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <button class="place-order" onclick="placeOrder()">🛍️ Place Order</button>
+  </div>
+</div>
+
+<!-- Dedicated Payment Scanner Modal -->
+<div class="modal" id="scannerModal">
+  <div class="modal-box scanner-modal-box">
+    <span class="close" onclick="closeScannerModal()">×</span>
+    <div class="scanner-header">
+      <div class="scanner-logo">🧁 ST BAKES</div>
+      <h2>UPI Payment Scanner</h2>
+      <p class="scanner-subtitle">Scan & Pay using any UPI app on your phone</p>
+    </div>
+
+    <div class="scanner-amount-badge">
+      <span>Total Amount to Pay</span>
+      <div class="amount-val">₹<span id="scanAmount">0</span></div>
+      <div class="order-ref">Order Reference: <span id="scanOrderId">#STB000000</span></div>
+    </div>
+
+    <div class="scanner-tabs">
+      <button class="tab-btn active" id="qrTabBtn" onclick="switchScannerTab('qr')">📱 Scan Bakery QR</button>
+      <button class="tab-btn" id="cameraTabBtn" onclick="switchScannerTab('camera')">📷 Camera Scanner</button>
+    </div>
+
+    <!-- Tab 1: QR Display with Animated Laser Scanner -->
+    <div id="qrScanTab" class="tab-content active">
+      <div class="qr-scanner-card">
+        <div class="qr-viewfinder">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div class="scanner-laser"></div>
+          <div id="qrcodeDisplay" class="qr-canvas-holder"></div>
+        </div>
+
+        <div class="scanner-timer">
+          ⏳ QR Code expires in: <span id="scannerTimer">05:00</span>
+        </div>
+
+        <div class="upi-apps-row">
+          <span class="upi-app-badge gpay">Google Pay</span>
+          <span class="upi-app-badge phonepe">PhonePe</span>
+          <span class="upi-app-badge paytm">Paytm</span>
+          <span class="upi-app-badge bhim">BHIM UPI</span>
+        </div>
+
+        <div class="upi-id-copy-box">
+          <span class="upi-label">Bakery UPI ID:</span>
+          <code id="upiIdText">stbakes@okaxis</code>
+          <button type="button" class="copy-btn" id="modalCopyBtn" onclick="copyUpiId(event)">📋 Copy</button>
+        </div>
+
+        <div class="mobile-pay-row">
+          <a id="upiIntentBtn" href="#" class="mobile-upi-btn">⚡ Tap to Pay via UPI App (Mobile)</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Camera Scanner -->
+    <div id="cameraScanTab" class="tab-content" style="display:none">
+      <div class="camera-scanner-card">
+        <div class="camera-viewfinder">
+          <video id="cameraVideo" playsinline autoplay></video>
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <div class="scanner-laser"></div>
+        </div>
+        <p class="camera-help" id="cameraStatusText">Point your camera at a QR code</p>
+        <div class="camera-actions">
+          <button type="button" class="cam-btn" onclick="startCamera()">▶️ Start Camera</button>
+          <button type="button" class="cam-btn stop" onclick="stopCamera()">⏹️ Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scanner-footer">
+      <button class="verify-pay-btn" id="verifyPayBtn" onclick="verifyAndCompletePayment()">
+        ✅ I Have Scanned & Paid
+      </button>
+      <button type="button" class="cancel-scan-btn" onclick="closeScannerModal()">
+        ← Back to Checkout / Change Method
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="successModal">
+  <div class="modal-box">
+    <div class="success">
+      <div class="success-icon">✅</div>
+      <h2>ORDER SUCCESSFUL!</h2>
+      <p>Your ST BAKES order has been placed successfully. Enjoy your treats!</p>
+      <div class="order-info">
+        <p><b>Order ID:</b> <span id="orderId"></span></p><br>
+        <p><b>Customer:</b> <span id="successName"></span></p><br>
+        <p><b>Delivery Date:</b> <span id="successDate"></span></p><br>
+        <p><b>Payment:</b> <span id="successPayment"></span></p><br>
+        <p><b>Total Amount:</b> ₹<span id="successTotal"></span></p>
+      </div>
+      <br>
+      <button class="place-order" onclick="closeModal('successModal')">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <h2>🧁 ST BAKES</h2><br>
+  <p>Fresh Cakes, Bakes & Pastries</p><br>
+  <p>© 2026 ST BAKES. All Rights Reserved.</p>
+</footer>
+</div>
+
+<script src="js/qrcode.min.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>
